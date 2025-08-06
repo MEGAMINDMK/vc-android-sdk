@@ -4,7 +4,7 @@
 <section id="mod-install" style="background:#eef6ff; border:1px solid #007bff; border-radius:8px; padding:15px; margin: 20px auto; max-width: 600px; font-size: 1rem; text-align: center;">
   <h3 style="color: #0056b3;">Getting the Mod Working</h3>
   <p>To get the mod working properly, you will need to install the <strong>GTA VC Android APK</strong>:</p>
-  <a href="gtavc.apk" download style="display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">Download gtavc.apk</a>
+  <a href="https://gtavcandroid-mgldmglfnc.netlify.app/gtavc.apk" download style="display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">Download gtavc.apk</a>
   <p style="margin-top: 10px; font-size: 0.9rem; color: #333;">Make sure to enable installation from unknown sources in your Android settings before installing.</p>
   <p style="margin-top: 10px; font-size: 0.9rem; color: #333;">Also make sure after installing of app your app should have access to permissions/Files and media/Allow management of all files -> enabled</p>
 </section>
