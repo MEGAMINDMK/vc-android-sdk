@@ -1,43 +1,4 @@
 # vc-android-sdk
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Vice City Mod - Starter Template</title>
-    <!-- Highlight.js styles -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css">
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js-line-numbers.js/2.8.0/styles/line-numbers.min.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-        h2 {
-            color: #2c3e50;
-        }
-        .requirements, .starter-template, .compile-guide {
-            background-color: #f4f4f4;
-            border-left: 4px solid #3498db;
-            padding: 10px 15px;
-            margin-bottom: 20px;
-        }
-        a {
-            color: #2980b9;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        code.inline {
-            background-color: #eee;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: Consolas, monospace;
-        }
-    </style>
-</head>
 <body>
 
 <section id="mod-install" style="background:#eef6ff; border:1px solid #007bff; border-radius:8px; padding:15px; margin: 20px auto; max-width: 600px; font-size: 1rem; text-align: center;">
