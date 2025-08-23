@@ -37,9 +37,6 @@ typedef void (*VoidFn)(void);
 
 // Font texture loaders
 VoidFn CFont_AddEFIGSFont = nullptr;
-VoidFn CFont_AddJapaneseTexture = nullptr;
-VoidFn CFont_AddRussianTexture = nullptr;
-VoidFn CFont_AddKoreanTexture = nullptr;
 
 // Function pointers
 CFont_SetScaleFn CFont_SetScale = nullptr;
@@ -50,37 +47,75 @@ CFont_SetJustifyOnFn CFont_SetJustifyOn = nullptr;
 CFont_SetDropShadowPositionFn CFont_SetDropShadowPosition = nullptr;
 CFont_SetDropColorFn CFont_SetDropColor = nullptr;
 
-// Hook CGame::Process
-DECL_HOOKv(CGame_Process)
+// Hook CHud::Draw
+DECL_HOOKv(CHud_Draw)
 {
-    CGame_Process(); // Call original game logic
+    CHud_Draw(); // call original HUD draw
 
+    // Font setup
     if (CFont_SetFontStyle) CFont_SetFontStyle(1);
     if (CFont_SetScale) CFont_SetScale(1.0f, 1.2f);
     if (CFont_SetJustifyOn) CFont_SetJustifyOn();
 
-    // Set text color
-    CRGBA red(135, 206, 250, 255);
-    if (CFont_SetColor) CFont_SetColor(&red);
+    CRGBA textColor(135, 206, 250, 255);
+    if (CFont_SetColor) CFont_SetColor(&textColor);
 
-    // Set drop shadow
     if (CFont_SetDropShadowPosition) CFont_SetDropShadowPosition(1);
     CRGBA shadowColor(0, 0, 0, 255);
     if (CFont_SetDropColor) CFont_SetDropColor(&shadowColor);
 
-    // Print text
-	 // EFIGS (English, etc.)
     if (CFont_AddEFIGSFont) CFont_AddEFIGSFont();
+
+    float x = 50.0f;
+
+    // Manual lines
     if (CFont_PrintString)
     {
-        char16_t msg[] = u"MEGAMIND was alwasy fond of making vcmp android but with his freind gtamods they are trying there best";
-        CFont_PrintString(300.0f, 40.0f, reinterpret_cast<unsigned short*>(msg));
+        // Messages
+char16_t line0[] = u"MEGAMIND loves modding games.";
+char16_t line1[] = u"Vice City is amazing at night.";
+char16_t line2[] = u"Random sentence generator in action.";
+char16_t line3[] = u"Mods can make games fun again.";
+char16_t line4[] = u"Learning C++ is rewarding.";
+char16_t line5[] = u"Custom fonts are cool.";
+char16_t line6[] = u"Text shadows add depth.";
+char16_t line7[] = u"Android mods are popular.";
+char16_t line8[] = u"Fonts support multiple languages.";
+char16_t line9[] = u"Rendering text is tricky.";
+char16_t line10[] = u"Another line to test rendering.";
+char16_t line11[] = u"Keep adding more lines here.";
+char16_t line12[] = u"Line 13 shows up nicely.";
+char16_t line13[] = u"Almost at the bottom of the screen.";
+char16_t line14[] = u"Line 15 is just for testing.";
+char16_t line15[] = u"Line 16 displays without issues.";
+char16_t line16[] = u"Line 17 makes the HUD fuller.";
+char16_t line17[] = u"Line 18 is right above the last lines.";
+char16_t line18[] = u"Line 19 appears correctly.";
+char16_t line19[] = u"Line 20 completes the test.";
+
+// Y positions (20 units apart)
+CFont_PrintString(x, 5.0f, reinterpret_cast<unsigned short*>(line0));
+CFont_PrintString(x, 25.0f, reinterpret_cast<unsigned short*>(line1));
+CFont_PrintString(x, 45.0f, reinterpret_cast<unsigned short*>(line2));
+CFont_PrintString(x, 65.0f, reinterpret_cast<unsigned short*>(line3));
+CFont_PrintString(x, 85.0f, reinterpret_cast<unsigned short*>(line4));
+CFont_PrintString(x, 105.0f, reinterpret_cast<unsigned short*>(line5));
+CFont_PrintString(x, 125.0f, reinterpret_cast<unsigned short*>(line6));
+CFont_PrintString(x, 145.0f, reinterpret_cast<unsigned short*>(line7));
+CFont_PrintString(x, 165.0f, reinterpret_cast<unsigned short*>(line8));
+CFont_PrintString(x, 185.0f, reinterpret_cast<unsigned short*>(line9));
+CFont_PrintString(x, 205.0f, reinterpret_cast<unsigned short*>(line10));
+CFont_PrintString(x, 225.0f, reinterpret_cast<unsigned short*>(line11));
+CFont_PrintString(x, 245.0f, reinterpret_cast<unsigned short*>(line12));
+CFont_PrintString(x, 265.0f, reinterpret_cast<unsigned short*>(line13));
+CFont_PrintString(x, 285.0f, reinterpret_cast<unsigned short*>(line14));
+CFont_PrintString(x, 305.0f, reinterpret_cast<unsigned short*>(line15));
+CFont_PrintString(x, 325.0f, reinterpret_cast<unsigned short*>(line16));
+CFont_PrintString(x, 345.0f, reinterpret_cast<unsigned short*>(line17));
+CFont_PrintString(x, 365.0f, reinterpret_cast<unsigned short*>(line18));
+CFont_PrintString(x, 385.0f, reinterpret_cast<unsigned short*>(line19));
+
     }
-	
-/*	usage before printing
-	if (CFont_AddJapaneseTexture) CFont_AddJapaneseTexture();
-	if (CFont_AddRussianTexture) CFont_AddRussianTexture();
-	if (CFont_AddKoreanTexture) CFont_AddKoreanTexture();*/
 }
 
 extern "C" void OnModLoad()
@@ -90,7 +125,6 @@ extern "C" void OnModLoad()
 
     if (pGTAVC && hGTAVC)
     {
-        // Load font-related symbols
         CFont_SetScale = (CFont_SetScaleFn)aml->GetSym(hGTAVC, "_ZN5CFont8SetScaleEff");
         CFont_PrintString = (CFont_PrintStringFn)aml->GetSym(hGTAVC, "_ZN5CFont11PrintStringEffPt");
         CFont_SetFontStyle = (CFont_SetFontStyleFn)aml->GetSym(hGTAVC, "_ZN5CFont12SetFontStyleEs");
@@ -98,13 +132,9 @@ extern "C" void OnModLoad()
         CFont_SetJustifyOn = (CFont_SetJustifyOnFn)aml->GetSym(hGTAVC, "_ZN5CFont12SetJustifyOnEv");
         CFont_SetDropShadowPosition = (CFont_SetDropShadowPositionFn)aml->GetSym(hGTAVC, "_ZN5CFont21SetDropShadowPositionEs");
         CFont_SetDropColor = (CFont_SetDropColorFn)aml->GetSym(hGTAVC, "_ZN5CFont12SetDropColorE5CRGBA");
-        // Font texture loaders
-        CFont_AddEFIGSFont = (VoidFn)aml->GetSym(hGTAVC, "_ZN5CFont12AddEFIGSFontEv");            // CFont::AddEFIGSFont()
-        CFont_AddJapaneseTexture = (VoidFn)aml->GetSym(hGTAVC, "_ZN5CFont18AddJapaneseTextureEv");// CFont::AddJapaneseTexture()
-        CFont_AddRussianTexture = (VoidFn)aml->GetSym(hGTAVC, "_ZN5CFont17AddRussianTextureEv");  // CFont::AddRussianTexture()
-        CFont_AddKoreanTexture = (VoidFn)aml->GetSym(hGTAVC, "_ZN5CFont16AddKoreanTextureEv");    // CFont::AddKoreanTexture()
+        CFont_AddEFIGSFont = (VoidFn)aml->GetSym(hGTAVC, "_ZN5CFont12AddEFIGSFontEv");
 
-        // Hook game loop
-        HOOKSYM(CGame_Process, hGTAVC, "_ZN5CGame7ProcessEv");
+        // Hook CHud::Draw instead of CGame::Process
+        HOOKSYM(CHud_Draw, hGTAVC, "_ZN4CHud4DrawEv");
     }
 }
