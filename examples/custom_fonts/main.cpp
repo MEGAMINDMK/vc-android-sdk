@@ -71,7 +71,9 @@ bool LoadTTFFont(const char* path)
 }
 
 // --- Draw one character ---
-void DrawGlyph(char ch, float& penX, float penY, float scale, const CRGBA& color)
+void DrawGlyph(char ch, float& penX, float penY, float scale, 
+               const CRGBA& color, 
+               const CRGBA* shadowColor = nullptr, float shadowOffset = 0.0f)
 {
     int w,h,xoff,yoff;
     unsigned char* bmp = stbtt_GetCodepointBitmap(&g_font, 0, scale, ch, &w,&h,&xoff,&yoff);
@@ -87,8 +89,18 @@ void DrawGlyph(char ch, float& penX, float penY, float scale, const CRGBA& color
                 {
                     float px = penX + x + xoff;
                     float py = penY + y + yoff;
+
+                    // --- Draw shadow first if requested ---
+                    if(shadowColor && shadowOffset > 0.0f)
+                    {
+                        CRect shadowRect(px + shadowOffset, py + shadowOffset,
+                                         px + shadowOffset + 1, py + shadowOffset + 1);
+                        CRGBA scol(shadowColor->r, shadowColor->g, shadowColor->b, c);
+                        CSprite2d_DrawRect(shadowRect, scol);
+                    }
+
+                    // --- Draw main glyph ---
                     CRect rect(px, py, px+1, py+1);
-                    // keep user color, apply glyph alpha
                     CRGBA col(color.r, color.g, color.b, c);
                     CSprite2d_DrawRect(rect, col);
                 }
@@ -104,7 +116,9 @@ void DrawGlyph(char ch, float& penX, float penY, float scale, const CRGBA& color
 }
 
 // --- Draw string ---
-void DrawString(const char* text, float startX, float startY, float pixelHeight, const CRGBA& color)
+void DrawString(const char* text, float startX, float startY, float pixelHeight, 
+                const CRGBA& color, 
+                const CRGBA* shadowColor = nullptr, float shadowOffset = 0.0f)
 {
     float scale = stbtt_ScaleForPixelHeight(&g_font, pixelHeight);
     float penX = startX;
@@ -112,7 +126,7 @@ void DrawString(const char* text, float startX, float startY, float pixelHeight,
 
     for(const char* p=text; *p; ++p)
     {
-        DrawGlyph(*p, penX, penY, scale, color);
+        DrawGlyph(*p, penX, penY, scale, color, shadowColor, shadowOffset);
     }
 }
 
@@ -121,7 +135,6 @@ std::string GetFontPath()
 {
     const char* txtPath = "/storage/emulated/0/VCMP/font.txt";
 
-    // If font.txt does not exist, create it with default "DroidSans"
     {
         std::ifstream check(txtPath);
         if(!check.is_open())
@@ -136,7 +149,6 @@ std::string GetFontPath()
         }
     }
 
-    // Now open for reading
     std::ifstream f(txtPath);
     if(!f.is_open())
     {
@@ -154,23 +166,19 @@ std::string GetFontPath()
         return "/system/fonts/DroidSans.ttf";
     }
 
-    // Trim CR or spaces
     while(!fontName.empty() && (fontName.back()=='\r' || fontName.back()==' ')) fontName.pop_back();
 
-    // If it's a full path, use directly
     if(fontName.find('/') != std::string::npos)
     {
         logi("Using direct font path: %s", fontName.c_str());
         return fontName;
     }
 
-    // If no extension, add .ttf
     if(fontName.find('.') == std::string::npos)
     {
         fontName += ".ttf";
     }
 
-    // VCMP path first
     std::string vcmpPath = std::string("/storage/emulated/0/VCMP/") + fontName;
     std::ifstream test1(vcmpPath);
     if(test1.is_open())
@@ -180,7 +188,6 @@ std::string GetFontPath()
         return vcmpPath;
     }
 
-    // System fonts
     std::string sysPath = std::string("/system/fonts/") + fontName;
     std::ifstream test2(sysPath);
     if(test2.is_open())
@@ -201,7 +208,18 @@ DECL_HOOKv(CHud__Draw)
 
     if(g_fontLoaded && CSprite2d_DrawRect)
     {
-        DrawString("MEGAMIND # / ( ) + = [ ] { } < > . ; ' * & ^ % $ @ !", 180.0f, 100.0f, 20.0f, CRGBA(0,255,0,255)); // green text
+        // Example 1: green text with black shadow (2px offset)
+        CRGBA mainColor(0,255,0,255);
+        CRGBA shadowCol(0,0,0,255);
+        DrawString("MEGAMIND with shadow!", 180.0f, 100.0f, 24.0f, mainColor, &shadowCol, 2.0f);
+
+        // Example 2: red text with blue shadow (3px offset)
+        CRGBA red(255,0,0,255);
+        CRGBA blue(0,0,255,255);
+        DrawString("COLOR TEST", 200.0f, 140.0f, 28.0f, red, &blue, 3.0f);
+
+        // Example 3: yellow text with no shadow
+        DrawString("NO SHADOW", 220.0f, 180.0f, 20.0f, CRGBA(255,255,0,255));
     }
 }
 
@@ -220,7 +238,6 @@ extern "C" void OnModLoad()
         else loge("Failed to resolve CSprite2d::DrawRect");
     }
 
-    // Read or create font.txt and load
     std::string fontPath = GetFontPath();
     LoadTTFFont(fontPath.c_str());
 }
