@@ -46,7 +46,7 @@ typedef void (*CSprite2d_DrawRectFn)(CRect const&, CRGBA const&);
 static CSprite2d_DrawRectFn CSprite2d_DrawRect = nullptr;
 
 // --- Load any font ---
-bool LoadTTFFont(const char* path, float pixelHeight)
+bool LoadTTFFont(const char* path)
 {
     std::ifstream file(path, std::ios::binary);
     if(!file.is_open())
@@ -66,12 +66,12 @@ bool LoadTTFFont(const char* path, float pixelHeight)
     }
 
     g_fontLoaded = true;
-    logi("Loaded font: %s (%.1fpx)", path, pixelHeight);
+    logi("Loaded font: %s", path);
     return true;
 }
 
 // --- Draw one character ---
-void DrawGlyph(char ch, float& penX, float penY, float scale)
+void DrawGlyph(char ch, float& penX, float penY, float scale, const CRGBA& color)
 {
     int w,h,xoff,yoff;
     unsigned char* bmp = stbtt_GetCodepointBitmap(&g_font, 0, scale, ch, &w,&h,&xoff,&yoff);
@@ -88,7 +88,8 @@ void DrawGlyph(char ch, float& penX, float penY, float scale)
                     float px = penX + x + xoff;
                     float py = penY + y + yoff;
                     CRect rect(px, py, px+1, py+1);
-                    CRGBA col(255,255,255,c);
+                    // keep user color, apply glyph alpha
+                    CRGBA col(color.r, color.g, color.b, c);
                     CSprite2d_DrawRect(rect, col);
                 }
             }
@@ -103,7 +104,7 @@ void DrawGlyph(char ch, float& penX, float penY, float scale)
 }
 
 // --- Draw string ---
-void DrawString(const char* text, float startX, float startY, float pixelHeight)
+void DrawString(const char* text, float startX, float startY, float pixelHeight, const CRGBA& color)
 {
     float scale = stbtt_ScaleForPixelHeight(&g_font, pixelHeight);
     float penX = startX;
@@ -111,7 +112,7 @@ void DrawString(const char* text, float startX, float startY, float pixelHeight)
 
     for(const char* p=text; *p; ++p)
     {
-        DrawGlyph(*p, penX, penY, scale);
+        DrawGlyph(*p, penX, penY, scale, color);
     }
 }
 
@@ -200,7 +201,7 @@ DECL_HOOKv(CHud__Draw)
 
     if(g_fontLoaded && CSprite2d_DrawRect)
     {
-        DrawString("MEGAMIND # / ( ) + = [ ] { } < > . ; ' * & ^ % $ @ !", 180.0f, 100.0f, 32.0f);
+        DrawString("MEGAMIND # / ( ) + = [ ] { } < > . ; ' * & ^ % $ @ !", 180.0f, 100.0f, 20.0f, CRGBA(0,255,0,255)); // green text
     }
 }
 
@@ -221,5 +222,5 @@ extern "C" void OnModLoad()
 
     // Read or create font.txt and load
     std::string fontPath = GetFontPath();
-    LoadTTFFont(fontPath.c_str(), 32.0f);
+    LoadTTFFont(fontPath.c_str());
 }
