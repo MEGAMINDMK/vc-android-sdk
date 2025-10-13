@@ -23,6 +23,10 @@ namespace HTTPSClient {
     bool POST(const std::string& host, const std::string& path, const std::string& data, 
               const std::string& contentType, std::string& response);
     
+    // Perform HTTPS POST request with authorization header
+    bool POST(const std::string& host, const std::string& path, const std::string& data, 
+              const std::string& contentType, const std::string& authorization, std::string& response);
+    
     // Cleanup resources (call when mod unloads)
     void Cleanup();
     
