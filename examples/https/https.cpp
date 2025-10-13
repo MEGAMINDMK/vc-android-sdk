@@ -192,4 +192,20 @@ namespace HTTPSClient {
         return PerformHTTPSRequest(host, request, response);
     }
 
+    // NEW FUNCTION: POST with Authorization header
+    bool POST(const std::string& host, const std::string& path, const std::string& data, 
+              const std::string& contentType, const std::string& authorization, std::string& response) {
+        std::string request = "POST " + path + " HTTP/1.1\r\n"
+                             "Host: " + host + "\r\n"
+                             "User-Agent: MEGAMIND-MOD/1.0\r\n"
+                             "Content-Type: " + contentType + "\r\n"
+                             "Authorization: Bearer " + authorization + "\r\n"
+                             "Content-Length: " + std::to_string(data.length()) + "\r\n"
+                             "Connection: close\r\n"
+                             "\r\n"
+                             + data;
+
+        return PerformHTTPSRequest(host, request, response);
+    }
+
 } // namespace HTTPSClient
